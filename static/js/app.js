@@ -6,7 +6,6 @@ var tbody = d3.select("tbody");
 
 // Convert data to table format
 function buildTable(data) {
-    
     // Clear the existing data from table
     tbody.html("");
 
@@ -23,17 +22,37 @@ function buildTable(data) {
     });
 }
 
+// Keep track of all filters
+var filterCategories = ["datetime", "city", "state", "country", "shape"];
+
 
 function handleClick() {
-    // Grab the datetime value from the filter
-    let date = d3.select("#datetime").property("value");
+    // Refresh the filteredData
     let filteredData = tableData;
     
-    // Check entry for the date 
-    if (date) {
-        // Filter to only keep row with datetime value matching the entered date
-        filteredData = filteredData.filter(row => row.datetime === date);
-    }
+    // Store the value entered for each filter category
+    let filterValues = [
+        d3.select("#datetime").property("value"),
+        d3.select("#city").property("value"),
+        d3.select("#state").property("value"),
+        d3.select("#country").property("value"),
+        d3.select("#shape").property("value")
+    ];
+
+    function updateFilters(category) {
+        // Return value for selected category
+        let i = filterCategories.indexOf(category);
+        filterValue = filterValues[i];
+
+        // If a filter value was entered then apply filter to filteredData
+        if (filterValue) {
+            filteredData = filteredData.filter(row => row[category] === filterValue);
+        };
+    };
+
+    // Apply filters
+    filterCategories.forEach(category => updateFilters(category));
+
     // Rebuilding table with filtered data
     buildTable(filteredData);
 }
